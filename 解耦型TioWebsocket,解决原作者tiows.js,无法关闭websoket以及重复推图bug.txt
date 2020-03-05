@@ -1,23 +1,23 @@
-½âñîĞÍTioWebsocket,½â¾öÔ­×÷Õßtiows.js,ÎŞ·¨¹Ø±ÕwebsoketÒÔ¼°ÖØ¸´ÍÆÍ¼bug
-µ÷ÓÃ·½Ê½£º
+//è§£è€¦å‹TioWebsocketï¼Œé‡æ–°å°è£…åŸç”Ÿwebsocket,è§£å†³åŸä½œè€…tiows.js,æ— æ³•å…³é—­websoketä»¥åŠé‡å¤æ¨å›¾bug
+//è°ƒç”¨æ–¹å¼ï¼š
 /**
  * Description:
  * @author JuniorRay
- * @date 2019-6-22ÖØ¹¹
- * µ÷ÓÃ·½·¨£º
+ * @date 2019-6-22é‡æ„
+ * è°ƒç”¨æ–¹æ³•ï¼š
  var  wsPort= "#(wsPort??)";
  var  wsHost= "#(wsHost??)";
- var ws_protocol = 'ws'; // ws »ò wss
- var heartbeatTimeout = 5000; // ĞÄÌø³¬Ê±Ê±¼ä£¬µ¥Î»£ººÁÃë
- var reconnInterval = 1000; // ÖØÁ¬¼ä¸ôÊ±¼ä£¬µ¥Î»£ººÁÃë
- var binaryType = 'blob'; // 'blob' or 'arraybuffer';//arraybufferÊÇ×Ö½Ú
- var handler = new DemoHandler_rtsp();//TioWebSocket´¦ÀíÒıÇæ,Çë²Î¿¼handlerµÄº¯Êı×¢ÊÍ
- var paramString = 'deviceId='+ivaeId+'&page=monitorRtsp.html';//´«µİµÄ²ÎÊı
+ var ws_protocol = 'ws'; // ws æˆ– wss
+ var heartbeatTimeout = 5000; // å¿ƒè·³è¶…æ—¶æ—¶é—´ï¼Œå•ä½ï¼šæ¯«ç§’
+ var reconnInterval = 1000; // é‡è¿é—´éš”æ—¶é—´ï¼Œå•ä½ï¼šæ¯«ç§’
+ var binaryType = 'blob'; // 'blob' or 'arraybuffer';//arraybufferæ˜¯å­—èŠ‚
+ var handler = new Handler();//TioWebSocketå¤„ç†å¼•æ“,è¯·å‚è€ƒhandlerçš„å‡½æ•°æ³¨é‡Š
+ var paramString = 'deviceId='+ivaeId+'&page=monitorRtsp.html';//ä¼ é€’çš„å‚æ•°
  var tiows;
  initWs();
  function initWs () {
        try{
-            tiows.close();//ÏÈ¹Ø±ÕÉÏÒ»´ÎµÄwebsocketÔÙÁ¬½Ó
+            tiows.close();//å…ˆå…³é—­ä¸Šä¸€æ¬¡çš„websocketå†è¿æ¥
             console.log("TIO---close")
         }catch(e){
 
@@ -32,45 +32,46 @@
                 handler:handler,
                 paramStr:paramString
          });
-         tiows.connect(isReconnect=false);//¿ªÊ¼Á¬½Ó£¬ÆäÖĞisReconnect=false¹Ø±Õ×Ô¶¯ÖØÁ¬
+         tiows.connect(isReconnect=false);//å¼€å§‹è¿æ¥ï¼Œå…¶ä¸­isReconnect=falseå…³é—­è‡ªåŠ¨é‡è¿
          console.log("TIO---new")
   }
- **/
-
-
-/**
-     * @param {*} ws_protocol wss or ws±êÊ¶
-     * @param {*} ip
-     * @param {*} port
-     * @param {*} paramStr ¼ÓÔÚws urlºóÃæµÄÇëÇó²ÎÊı£¬ĞÎÈç£ºname=ÕÅÈı&id=12
-     * @param {*} handler ×÷ÎªwebSocketÖ´ĞĞ´¦ÀíÆ÷£¬
-     * var handler= function () {
+  var Handler= function () {
         this.onopen = function (event, ws) {
             ws.send({gbNum:gbNum,cameraIp:cameraIp});
         }
         this.onmessage = function (event, ws) {
             var data = $.parseJSON(event.data);
-            console.log("ÊÕµ½Êı¾İ"+event.data);
-          //ÄãµÄ´¦ÀíÂß¼­
+            console.log("æ”¶åˆ°æ•°æ®"+event.data);
+          //ä½ çš„å¤„ç†é€»è¾‘
         }
         this.onclose = function (event, ws) {
-            console.log("Á¬½Ó¹Ø±Õ...ivaeId="+ivaeId);
+            console.log("è¿æ¥å…³é—­...ivaeId="+ivaeId);
             ws.close(event);
         }
         this.onerror = function (event, ws) {
             // error(event, ws)
-            layer.close(loadProgress);//Çå³ı½ø¶ÈÌõ
+            layer.close(loadProgress);//æ¸…é™¤è¿›åº¦æ¡
             ws.close(event);
         }
-         // ·¢ËÍĞÄÌø£¬±¾¿ò¼Ü»á×Ô¶¯¶¨Ê±µ÷ÓÃ¸Ã·½·¨£¬ÇëÔÚ¸Ã·½·¨ÖĞ·¢ËÍĞÄÌø
+         // å‘é€å¿ƒè·³ï¼Œæœ¬æ¡†æ¶ä¼šè‡ªåŠ¨å®šæ—¶è°ƒç”¨è¯¥æ–¹æ³•ï¼Œè¯·åœ¨è¯¥æ–¹æ³•ä¸­å‘é€å¿ƒè·³
          this.ping = function (ws) {
-            // log("·¢ĞÄÌøÁË")
-            ws.send('ĞÄÌøÄÚÈİ')
+            // log("å‘å¿ƒè·³äº†")
+            ws.send('å¿ƒè·³å†…å®¹')
         }
     }
-     * @param {*} heartbeatTimeout ĞÄÌøÊ±¼ä µ¥Î»£ººÁÃë
-     * @param {*} reconnInterval Ê§°ÜºóÖØÁ¬¼ä¸ôÊ±¼ä µ¥Î»£ººÁÃë
-     * @param {*} binaryType 'blob' or 'arraybuffer';//arraybufferÊÇ×Ö½Ú,'blob'¶ş½øÖÆ´ó¶ÔÏó
+ **/
+
+
+/**
+     * @param {*} ws_protocol wss or wsæ ‡è¯†
+     * @param {*} ip
+     * @param {*} port
+     * @param {*} paramStr åŠ åœ¨ws urlåé¢çš„è¯·æ±‚å‚æ•°ï¼Œå½¢å¦‚ï¼šname=å¼ ä¸‰&id=12
+     * @param {*} handler ä½œä¸ºwebSocketæ‰§è¡Œå¤„ç†å™¨ï¼Œ
+    
+     * @param {*} heartbeatTimeout å¿ƒè·³æ—¶é—´ å•ä½ï¼šæ¯«ç§’
+     * @param {*} reconnInterval å¤±è´¥åé‡è¿é—´éš”æ—¶é—´ å•ä½ï¼šæ¯«ç§’
+     * @param {*} binaryType 'blob' or 'arraybuffer';//arraybufferæ˜¯å­—èŠ‚,'blob'äºŒè¿›åˆ¶å¤§å¯¹è±¡
      */
 
 
