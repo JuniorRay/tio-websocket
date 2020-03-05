@@ -9,7 +9,7 @@
  var heartbeatTimeout = 5000; // 心跳超时时间，单位：毫秒
  var reconnInterval = 1000; // 重连间隔时间，单位：毫秒
  var binaryType = 'blob'; // 'blob' or 'arraybuffer';//arraybuffer是字节
- var handler = new DemoHandler_rtsp();//TioWebSocket处理引擎,请参考handler的函数注释
+ var handler = new Handler();//TioWebSocket处理引擎,请参考handler的函数注释
  var paramString = 'deviceId='+ivaeId+'&page=monitorRtsp.html';//传递的参数
  var tiows;
  initWs();
@@ -33,17 +33,8 @@
          tiows.connect(isReconnect=false);//开始连接，其中isReconnect=false关闭自动重连
          console.log("TIO---new")
   }
- **/
 
-var TioWebsocket = function(obj) {
-    // console.log("开始实例化TioWebsocket："+TioWebsocket);
-    /**
-     * @param {*} ws_protocol wss or ws标识
-     * @param {*} ip
-     * @param {*} port
-     * @param {*} paramStr 加在ws url后面的请求参数，形如：name=张三&id=12
-     * @param {*} handler 作为webSocket执行处理器，
-     * var handler= function () {
+  var Handler= function () {
         this.onopen = function (event, ws) {
             ws.send({gbNum:gbNum,cameraIp:cameraIp});
         }
@@ -67,6 +58,17 @@ var TioWebsocket = function(obj) {
             ws.send('心跳内容')
         }
     }
+ **/
+
+var TioWebsocket = function(obj) {
+    // console.log("开始实例化TioWebsocket："+TioWebsocket);
+    /**
+     * @param {*} ws_protocol wss or ws标识
+     * @param {*} ip
+     * @param {*} port
+     * @param {*} paramStr 加在ws url后面的请求参数，形如：name=张三&id=12
+     * @param {*} Handler 作为webSocket执行处理器，
+
      * @param {*} heartbeatTimeout 心跳时间 单位：毫秒
      * @param {*} reconnInterval 失败后重连间隔时间 单位：毫秒
      * @param {*} binaryType 'blob' or 'arraybuffer';//arraybuffer是字节,'blob'二进制大对象
@@ -112,7 +114,7 @@ TioWebsocket.prototype.connect=function(isReconnect){//是否重新连接
         _url = this.reconnUrl;
     }
 
-    var ws=new WebSocket(_url);
+    var ws=new WebSocket(_url); ;
     /**WebSocket的异常是异步的，你要用onerror方法获取异常
      * js中是不能catch住websocket的超时error的，这个是设计的限制。
      * **/
