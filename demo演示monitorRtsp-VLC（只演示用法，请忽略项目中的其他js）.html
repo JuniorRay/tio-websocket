@@ -122,232 +122,18 @@
 </body>
 
 <script src="#(BASE_PATH??)/assets/js/jquery-3.1.1.min.js"></script>
-<script src="#(BASE_PATH??)/assets/js/sockJS/sockjs-1.0.0.min.js"></script>
-<script type="text/javascript" src="/assets/layui-v2.0.0/layui.all.js"></script>
-<script src="#(BASE_PATH??)/assets/js/date_pattern.js"></script>
 <script src="#(BASE_PATH??)/assets/js/ws/tio/TioWebsocket.js"></script>
-<script src="#(BASE_PATH??)/assets/js/date_format.js"></script>
-<script src="#(BASE_PATH??)/assets/js/ScreenResize.js"></script>
 
-<script src="/assets/js/TimeTools.js"></script>
-<script src="/assets/js/Search.js"></script>
-<script src="#(BASE_PATH??)/assets/js/CookieUtil.js?v=20190504"></script>
-<script src="/assets/js/archiveTool.js"></script>
-<script src="/assets/js/faceSearchTool.js?v=2018121203"></script>
-<script src="#(BASE_PATH??)/assets/js/ScreenShotTool.js?v=20190424"></script>
-<script src="/assets/js/archiveTool.js"></script>
-<script src="/assets/js/Utils.js"></script>
-<script src="#(BASE_PATH??)/assets/js/btnTool.js"></script>
-<script>
 
-    //图片列表鼠标滑过事件
-    /* $('.result_list').on('mouseover', 'li', function () {
-        $(this).find('.btnGroup').show();
-        $(this).find('.result_describe').show();
-    }).on('mouseout', 'li', function () {
-        $(this).find('.btnGroup').hide();
-        $(this).find('.result_describe').hide();
-    }); */
-</script>
-<!-- Swiper JS -->
-<!-- <script src="/assets/swiper-4.2.2/dist/js/swiper.min.js"></script> -->
 <script>
 $(function(){
 	// debugger;
-    var ivaeId;
+    var ivaeId="#(ivaeId??)";
     camareId = "#(camareId??)";
     
     var ip = "#(surveilIp??'')";
-    
-    //var depId = "#(depId??)";
-    var faceSearch = new faceSearchTool();
-    // $(window).on('beforeunload', function(){
-    //     return 'Are you sure you want to leave?';
-    // });
-    var utils=new Utils();
-    var cookieUtil = new CookieUtil();
-    var screenShotTool = new ScreenShotTool();
-    layui.use(['layer','form'], function(){
-        var layer = layui.layer,
-            form = layui.form;
-    
-    $(function(){
-            // if(!utils.isInstalledVLC("vlct")){//判断是否安装了,如果没有安装会自动弹出下载，然后终止往下执行
-            //     return;
-            // }            // utils.playToIE();//检测是否为谷歌浏览器，是则跳转IE播放
+   
             
-            ivaeId = "#(ivaeId??)";
-            
-            var isBackground = cookieUtil.get("isBackground");
-    		if((isBackground != "undefined"
-    			&& isBackground != undefined 
-    			&& isBackground != null)){
-    			isBackground = (isBackground == false || isBackground == 'false') ? false : true;
-    		}else {
-    			isBackground = true;
-    			cookieUtil.set("isBackground", isBackground, 30);
-    		}
-    		$(".switchComparePhoto").prop("checked",isBackground);
-    		form.render();
-            form.on('switch(switchComparePhoto)', function(data){
-                //控制原图背景开/关
-                cookieUtil.set("isBackground", this.checked, 30);
-                //若开启开关则关闭原图翻页
-                $('.snapShotList,.faceTree,.snapShotListCar').find('li').find('img').each(function(){
-                	var pic_type = $(this).parent().data('type');
-                	if(pic_type != '1'){
-                     	screenShotTool.setWidth_height(136,180);
-                     }else{
-                     	screenShotTool.setWidth_height(247,113); 
-                     }
-                	$(this).attr('src',screenShotTool.getScreenshotPath($(this).data('src')));
-                });
-            });
-            
-            // layer.closeAll();
-            function resize_win(){
-                var w_h = $(window).height();
-                // $('.layui-body').height(w_h-90);
-                // $('.monitorBox').height(w_h-110);
-                // $("#vlc").css({"width":"45.5vw!important","height":"47.5vh!important"});
-            }
-            resize_win();
-            $(window).resize(function(){
-                resize_win();
-            });
-            var suspectId = '';
-            //人形
-            $('.snapShotList').on('mouseover','li',function(e){
-                $(this).find('.btnGroup').removeClass('visibility-hidden').addClass('visibility');
-            }).on('mouseout','li',function(e){
-                $(this).find('.btnGroup').removeClass('visibility').addClass('visibility-hidden');
-            });
-            
-            //车辆
-            $('.snapShotListCar').on('mouseover','li',function(e){
-                $(this).find('.btnGroup').removeClass('visibility-hidden').addClass('visibility');
-            }).on('mouseout','li',function(e){
-                $(this).find('.btnGroup').removeClass('visibility').addClass('visibility-hidden');
-            });
-            //人脸
-            $('.snapShotListFace').on('mouseover','li',function(e){
-                $(this).find('.btnGroup').removeClass('visibility-hidden').addClass('visibility');
-            }).on('mouseout','li',function(e){
-                $(this).find('.btnGroup').removeClass('visibility').addClass('visibility-hidden');
-            });
-
-            //layui-unselect layui-form-select layui-form-selected
-            //$('#suspect_list_wrap').find('.layui-unselect').addClass('layui-form-selected');
-            $('.snapShotList,.faceTree,.snapShotListCar').on('click',function(e){
-                var target = e.target;
-                if($(target).is('.originalBtn')){
-                	//alert(1111111111111111111111)
-                	 var photo = $(target).parent().siblings('.photo');
-                	 var src = photo.find('img').data('src');
-                    // 查看原图
-                    // debugger
-                   //var esId = $(target).data("esid");
-                    var esId = $(target).parent().parent().data("esid");
-                    //var camTime = $(target).data("camtime");
-                     var camTime = photo.data('time');
-                    // var camId = $(target).data("camid");
-                    var camId = $(target).parent().siblings(".photo").data("camid");
-                    $("#vlct").hide();
-                    var search=new Search();
-					
-                    if(Utils.getBrowser()=="IE"){
-                    	//TODO----------------
-                      	var route ='/common/comparePhoto?esId=' + esId + '&camTime=' + camTime + '&camId=' + camId ;
-                        var url="http://"+ window.location.hostname+":"+window.location.port + route;
-                        Utils.openByChrome(url);
-                        return;
-                    }
-                    search.openOriginalImagePage(esId,camId,camTime,"",true)
-                    
-                  
-
-                }else if($(target).is('.temporaryBtn')){
-                    var src = $(target).siblings().find('img').data('src');
-                    //归档
-                    var esId = $(target).data("esid");
-                    var camTime = $(target).data("camtime");
-                    var camId = $(target).data("camid");
-                    var archivesId = new CookieUtil().getArchiveId();
-                    var type = $(target).data("type");
-                    //获取分局来源部门id
-                    var departmentId = $(target).data("depid");
-                    archivesPhotoImgList(src, archivesId, new Date(camTime).pattern("yyyy-MM-dd HH:mm:ss"), esId, camId, type,departmentId,function (data) {
-                        layer.msg(data.msg);
-                    },function () {
-                        layer.msg("保存失败");
-                    });
-                }else if($(target).is('.searchBtn')){ 
-                    //跳转搜索
-                   var photo = $(target).parent().siblings('.photo');
-                	 var src = photo.find('img').data('src');
-                	 // debugger;
-                	 var camTime = photo.data('time');
-                    var camId = photo.data("camid");
-                    var esId = $(target).parent().parent().data("esid");
-                    
-					
-                    if(Utils.getBrowser()=="IE"){
-                    	camTime=new Date(Date.parse((camTime + "").replace(/-/g, "/")))
-                    	 var timeLong = new Date(camTime).getTime();
-                    	 var startDate = new Date(timeLong).format("yyyy-MM-dd");
-                    	 var endDate = new Date(timeLong).format("yyyy-MM-dd");
-                         var timeTools = new TimeTools();
-                         
-                         //处理IE时间兼容： new Date(Date.parse(str.replace(/-/g,"/"))).getTime()
-                         //var startDate = new Date(Date.parse((timeLong + "").replace(/-/g, "/")));
-                         //var allEndDate = new Date(Date.parse((endDate + "").replace(/-/g, "/")));
-                         
-                         
-                         // 返回前后5分钟的时间
-                         var timeHourObj = timeTools.getAreaTime(timeLong, 5, "hh:mm");
-                         var startHour = timeHourObj.startTime;
-                         var endHour = timeHourObj.endTime; 
-                         var type=1;//人
-                    	var route='/search/image?src=' + src + '&startTime=' + startDate + '&startHour=' + startHour + '&endHour=' + endHour + '&camIds=' + camId+ '&type=' + type + '&newOpenPageFlag='+true+ '&endTime=' + endDate ;
-                    	 var url="http://"+ window.location.hostname+":"+window.location.port+ route  ;
-                         Utils.openByChrome(url);
-                         return;
-                    }
-                    
-                    
-                    //搜索前后5分钟的图片(跳转以图搜图)
-                    //通过父页面以图搜图的图片搜索列表判断弹窗是否存在，如果存在就不新开，直接把图片加入以图搜图的搜索列表
-                    //判断父页面函数是否存在
-                    if(typeof(parent.openSearchImagePage)=="function" ){
-                        //父页面打开以图搜图
-                        parent.openSearchImagePage(src,camTime,camId,1);
-                        
-                     
-                    } else{
-                        var search=new Search();
-                        search.openSearchImagePage(src,camTime,camId,1);
-                       
-                    } 
-                    
-                    
-                    
-                }else if($(target).is('.face_comparisonBtn')){
-                	var photo = $(target).parent().siblings('.photo');
-                    var path = photo.find('img').data('src');
-                    var camTime = photo.data('time');
-                    var time = new Date(camTime).getTime();
-                    if(Utils.getBrowser()=="IE"){
-                    	 var url="http://"+ window.location.hostname+":"+window.location.port+"/search/image/toFaceSeachImage?"+"&photoPath="+path+"&time="+time;
-                         Utils.openByChrome(url);
-                         return;
-                    }
-                	//对比人脸库
-                	faceSearch.faceSearch('',path,time,1);
-                  
-                }
-            });
-
-            // debugger;
             // 处理 WebSocket
             var  wsPort= "80";
             var  wsHost= "15.45.223.199";
@@ -366,20 +152,19 @@ $(function(){
             var reconnInterval = 1000; // 重连间隔时间，单位：毫秒
 
             var binaryType = 'blob'; // 'blob' or 'arraybuffer';//arraybuffer是字节
-            var handler = new DemoHandler_rtsp();
-            var queryString = 'deviceId='+ivaeId;
+            var handler = new DemoHandler();//websocket处理引擎
+            var queryString = 'deviceId='+ivaeId;//自定义携带参数多个参数类似这样&分隔'type=yourType&deviceId=yourDeviceId'
 
 
             var tiows;
-            var tiowsGA;
-            initWs();
+         
+            initWs();//开启websoket
            
             function initWs () {
           	 try{
                    tiows.close();//先关闭上一次的websocket再连接
                    console.log("TIO---close")
-                   tiowsGA.close();//先关闭上一次的websocket再连接
-                   console.log("TIO---close GA")
+                  
                }catch(e){
 
                }
@@ -393,34 +178,17 @@ $(function(){
                    handler:handler,
                    paramStr:queryString
                });
-               tiows.connect(isReconnect=true);//开始连接，其中isReconnect=false关闭自动重连
+               tiows.connect(isReconnect=false);//开始连接，其中isReconnect=false关闭自动重连
                console.log("TIO---new");
 
-               // 公安网
-               tiowsGA=new TioWebsocket({
-                   ws_protocol:ws_protocol,
-                   ip:location.hostname,
-                   port:location.port,
-                   heartbeatTimeout:heartbeatTimeout,
-                   reconnInterval:reconnInterval,
-                   binaryType:binaryType,
-                   handler:handler,
-                   paramStr:queryString
-               });
-               tiowsGA.connect(isReconnect=true);//开始连接，其中isReconnect=false关闭自动重连
-               console.log("TIO---new GA");
+              
             }
-        });
-    });
-    //登出
-    function ButtonLogout_onclick()
-    {
-        Logout();
-    }
-    var DemoHandler_rtsp = function () {
+     
+   //websoket引擎
+    var DemoHandler = function () {
         this.onopen = function (event, ws) {
-            // ws.send('hello 连上了哦')
-            // document.getElementById('contentId').innerHTML += 'hello 连上了哦<br>';
+            alert('hello 连上了哦')
+           
         }
         /**
          * 收到服务器发来的消息
@@ -428,121 +196,9 @@ $(function(){
          * @param {*} ws
          */
         this.onmessage = function (event, ws) {
-            //console.log("event.data.length========="+event.data.length);
-            var data = $.parseJSON(event.data);
-            var attribute = data.attribute;
-            var base = data.base;
-            var camAddr = base.camAddr;
-            var picPath = base.picPath;
-            var esId = data.id
-            var camId = base.camId
-            var camTime = base.camTime
-            var pGroup = '<div class="result_describe">';
-            var span = '';
-            var pic_type=base.type;
-            if(Utils.isBlank(pic_type)){
-                pic_type=data.type
-            }
-            /* 车牌图片w_h_x_y */
-   			 var cpX = 0;
-        	var cpY = 0;
-            var cpWidth = 0;
-            var cpHeight = 0;  
-            
-            // if(!pic_type){
-            // 	var csys=attribute.csys;
-            // 	if(!csys){
-            // 		pic_type = 0;
-            // 	}else{
-            // 		pic_type = 1;
-            // 		cpX = attribute.cpX+base.picX;
-            //     	cpY = attribute.cpY+base.picY;
-            //         cpWidth = attribute.cpWidth;
-            //         cpHeight = attribute.cpHeight;
-            //
-            // 	}
-            // }else{
-            //     pic_type = 2;
-            // }
-            if(pic_type != 1){
-             	screenShotTool.setWidth_height(136,180);
-             }else{
-             	screenShotTool.setWidth_height(247,113); 
-             }
-
-            if(attribute){
-                for(var j=0;j<attribute.length;j++){
-                pGroup += '<p class="layui-elip" title="'+attribute[j].name+'">'+attribute[j].type+':'+attribute[j].name+'</p>';
-            }
-            }
-            var li = '<li class="softSz-border-lightBlue" data-id="'+camareId+'" data-esid="'+esId+'" >'+
-                '	<a href="javascript:;" class="photo" data-time="'+camTime+'"   data-camid="'+camareId+'"  data-type="'+pic_type+'">' +
-                '<img src="/'+ip+'/upload/'+screenShotTool.getScreenshotPath(picPath)+'" onerror="setTimeout(this.src=\'/'+ip+'/upload/'+screenShotTool.getScreenshotPath(picPath)+'\',1500)" data-src="/'+ip+'/upload/'+picPath+'"></a>';
-                //'	<a href="javascript:;" class="img_wrap" data-src="'+picPath+'"><span class="img_s_w"><img class="img_s" src="/upload/'+picPath+'"></span><span class="img_b_w"><img class="img_b" src="/upload/'+picPath+'"></span></a>'+
-                // '   <a href="javascript:;" class="normalBtn dn suspectBtn" data-esid="'+esId+'" data-camid="'+camId+'" data-camtime="'+camTime+'">原图</a>'+
-                // '	 <a href="javascript:;" class="normalBtn dn temporaryBtn"  data-esid="'+esId+'" data-camid="'+camId+'" data-camtime="'+camTime+'">归档</a>'+
-                // '	 <a href="javascript:;" class="normalBtn dn searchBtn" data-camid="'+camId+'" data-camtime="'+camTime+'">搜索</a>'+
-                // '</li>';
-            pGroup+= '<p class="layui-elip">地址:'+camAddr+'</p></div>';
-            li+=pGroup;
-            if(pic_type==2){
-                li+=' <div class="btnGroup visibility-hidden" >' +
-                '                <button href="javascript:;" class="faceComparisonBtn softSz-btn softSz-btn-mini" data-esid="'+esId+'" data-type="'+pic_type+'" ' +'data-camid="'+camareId+'" data-camtime="'+camTime+'"'+
-                '                        style="float:left;">' +
-                '                    对比' +
-                '                </button>' +
-               
-                '</li>';
-			}else{
-				li+=' <div class="btnGroup visibility-hidden" >' +
-                '                <button href="javascript:;" class="originalBtn softSz-btn softSz-btn-mini" data-esid="'+esId+'" data-type="'+pic_type+'" ' +'data-camid="'+camareId+'" data-camtime="'+camTime+'"'+
-                '                        style="float:left;">' +
-                '                    原图' +
-                 '                </button>' +
-            //     '<button href="javascript:;" class="temporaryBtn softSz-btn softSz-btn-mini" data-esid="'+esId+'" data-type="'+pic_type+'" ' +'data-camid="'+camId+'" data-camtime="'+camTime+'"'+
-            // '                        style="float:right;">' +
-            // '                    归档' +
-            // '                </button>' +
-            //     '                <button href="javascript:;" class="searchBtn softSz-btn softSz-btn-mini"' +'data-camid="'+camId+'" data-type="'+pic_type+'" data-camtime="'+camTime+'"'+
-            //     '                        style="float:right;">' +
-            //     '                    搜索' +
-            //     '                </button>' +
-                '            </div>' +
-                '</li>';
-			}
-            // $('#describeRight').html(span);
-          /*   $('#snapShotList').prepend(li);
-            $('#snapShotList').find('li:gt(49)').remove(); */
-            
-            if(pic_type==0){
-                $('#snapShotList').prepend(li);
-                var count = $("#labCount_human").text();
-                if(count){
-                	count = parseInt(count);
-                }
-                $("#labCount_human").text(++count);
-                $('#snapShotList').find('li:gt(49)').remove();
-			}
-			if(pic_type==1){
-                $('#snapShotListCar').prepend(li);
-                var count = $("#labCount_car").text();
-                if(count){
-                	count = parseInt(count);
-                }
-                $("#labCount_car").text(++count);
-                $('#snapShotListCar').find('li:gt(49)').remove();
-
-			}
-			if(pic_type==2){
-                $('#snapShotListFace').prepend(li);
-                var count = $("#labCount_face").text();
-                if(count){
-                	count = parseInt(count);
-                }
-                $("#labCount_face").text(++count);
-                $('#snapShotListFace,faceTree').find('li:gt(49)').remove();
-                
-			}
+            /***写你的逻辑**/
+            var data = $.parseJSON(event.data);//websocket数据
+           
 
         }
 
