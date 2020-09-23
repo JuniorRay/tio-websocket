@@ -7,7 +7,7 @@
 
  
  调用方法：
- 
+ ```javascript
 
     var tioWebsocket=new TioWebsocket({
     
@@ -82,5 +82,5 @@
 
 //tioWebsocket.ping();//发送心跳
 
-
+```
 
