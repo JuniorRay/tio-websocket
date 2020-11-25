@@ -1,4 +1,4 @@
-#解耦型websocket,支持ws协议，wss协议。支持keep alive保活，支持失败自动重连，实现websocket系统高可用
+解耦型websocket,支持ws协议,wss协议;支持心跳保活,失败自动重连,避免重复推送问题,实现websocket系统高可用;
  
  * @author JuniorRay
  
