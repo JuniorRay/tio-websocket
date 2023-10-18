@@ -224,7 +224,7 @@
         this.callBackWebsocket.send(data,function(err){
             if(err) {
                 console.error("消息发送出现异常:" ,err);
-                return;
+                return this;
             }
             console.log("消息发送成功:",data);
         });
