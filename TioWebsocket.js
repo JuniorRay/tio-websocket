@@ -5,7 +5,7 @@
  * @date 2020-8-05修改精简代码方便调用
  * 调用方法：
 
-    var tioWebsocket=new TioWebsocket({
+ var tioWebsocket=new TioWebsocket({
         ip:"218.17.207.5",
         port:"8602",
         paramStr :'type=MON:0&deviceId='+196,//传递的参数
@@ -39,10 +39,10 @@
 
     }).connect();//开始连接TioWebsocket!
 
-//tioWebsocket.close();//关闭websocket
-//tioWebsocket.reconnect();//重新连接TioWebsocket
-//tioWebsocket.send("你需要发送的数据");//发送数据
-//tioWebsocket.ping();//发送心跳
+ //tioWebsocket.close();//关闭websocket
+ //tioWebsocket.reconnect();//重新连接TioWebsocket
+ //tioWebsocket.send("你需要发送的数据");//发送数据
+ //tioWebsocket.ping();//发送心跳
 
  **/
 (function (root,factory) {
@@ -76,11 +76,11 @@
          * @param {*} binaryType 'blob' or 'arraybuffer';//arraybuffer是字节,'blob'二进制大对象
          */
         this.name = "Junior制作";
-        this.ip=obj.ip;
-        this.port=obj.port;
+        this.ip = obj.ip;
+        this.port = obj.port;
         this.wsProtocol = obj.wsProtocol||'ws'; // ws 或 wss
-        this.url=this.wsProtocol + '://' + this.ip + ':' + this.port + "/ws/msg.ws";//请求后缀方便nginx代理
-        this.paramStr=obj.paramStr;
+        this.url = this.wsProtocol + '://' + this.ip + ':' + this.port + "/ws/msg.ws";//请求后缀方便nginx代理
+        this.paramStr = obj.paramStr;
         if (obj.paramStr) {//形如：name=张三&id=12
             this.url += '?' + obj.paramStr
             this.reconnUrl = this.url + "&"
@@ -88,11 +88,11 @@
             this.reconnUrl = this.url + "?"
         }
         this.reconnUrl += "tiows_reconnect=true";
-        this.handler=obj.handler;//执行处理引擎函数
-        this.heartbeatTimeout=obj.heartbeatTimeout||5000;//5s
+        this.handler = obj.handler;//执行处理引擎函数
+        this.heartbeatTimeout = obj.heartbeatTimeout||5000;//5s
         this.reconnTime = obj.reconnTime||3;//websocket重连次数
-        this.reconnInterval=obj.reconnInterval||3000;//3s
-        this.binaryType=obj.binaryType||'arraybuffer';
+        this.reconnInterval = obj.reconnInterval||3000;//3s
+        this.binaryType = obj.binaryType||'arraybuffer';
         this.lastInteractionTime = function () {//上次交互时间
             if (arguments.length == 1) {
                 this.lastInteractionTimeValue = arguments[0]
@@ -103,6 +103,7 @@
         this.heartbeatSendInterval = this.heartbeatTimeout / 2
 
         this.callBackWebsocket;//保存connect返回的websocket对象
+        this.obj = obj;
 
         return this;
 
@@ -127,6 +128,8 @@
         var selfTioWs = this;//TioWebsocket
 
         ws.onopen = function (event) {
+            tiows.reconnTime = selfTioWs.obj.reconnTime;
+
             console.log("TioWebSocket开启");
             selfTioWs.handler.onopen.call(selfTioWs.handler, event, ws);//调用函数handler,selfTioWs.handler调用自己的onopen方法传入参数event，ws
             selfTioWs.lastInteractionTime(new Date().getTime());//lastInteractionTime
@@ -140,23 +143,33 @@
             selfTioWs.lastInteractionTime(new Date().getTime());//lastInteractionTime
         };
         ws.onclose = function (event) {
-            console.log("TioWebSocket关闭");
+            console.log("TioWebSocket关闭:event",event);
             clearInterval(selfTioWs.pingIntervalId);// clear send heartbeat task
+
+            var isClosed = false;
 
             try {
                 selfTioWs.handler.onclose.call(selfTioWs.handler, event, ws);//调用函数handler,selfTioWs.handler调用自己的onclose方法传入参数event，ws
-                ws.close(event.code,event.reason);
+                // ws.close(event.code,event.reason);
+                ws.close();
+                isClosed = true;
             } catch (error) {
+                console.error(error);
+                isClosed = false;
+            }
 
+            if (tiows.reconnTime > 0 && isClosed) {//进行判断是否进行重新连接操作
+                console.log("TioWebSocket重连次数还剩"+tiows.reconnTime+"次,耗尽将不再重连");
+                selfTioWs.reconnect(event)
             }
 
         };
         ws.onerror = function (event) {
-            console.error("TioWebSocket连接失败，请检查浏览器是否支持，以及ip,端口等配置是否正确");
+            console.error("TioWebSocket连接失败，请检查浏览器是否支持，以及ip,端口等配置是否正确:event:",event);
             selfTioWs.handler.onerror.call(selfTioWs.handler, event, ws);
             ws.close(event.code,event.reason);
 
-            if (tiows.reconnTime>0) {//进行判断是否进行重新连接操作
+            if (tiows.reconnTime > 0) {//进行判断是否进行重新连接操作
                 console.log("TioWebSocket重连次数还剩"+tiows.reconnTime+"次,耗尽将不再重连");
                 selfTioWs.reconnect(event)
             }
@@ -193,7 +206,13 @@
         if ((this.heartbeatSendInterval + iv) >= this.heartbeatTimeout) {
             this.handler.ping(this.callBackWebsocket);
             console.log("TioWebSocket,正在尝试发送心跳");
-            this.callBackWebsocket.send('TioWebSocket,正在尝试发送心跳');
+            this.callBackWebsocket.send('TioWebSocket,正在尝试发送心跳',function(err){
+                if(err) {
+                    console.error("发送心跳出现异常:" ,err);
+                    return;
+                }
+                console.log("发送心跳成功:");
+            });
         }
 
         return this;
@@ -202,7 +221,13 @@
     /**send 发送数据
      * */
     TioWebsocket.prototype.send=function(data) {
-        this.callBackWebsocket.send(data);
+        this.callBackWebsocket.send(data,function(err){
+            if(err) {
+                console.error("消息发送出现异常:" ,err);
+                return;
+            }
+            console.log("消息发送成功:",data);
+        });
         return this;
     };
 
